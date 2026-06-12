@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>打卡链路 Demo</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #000;
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      }
+
+      .iphone-demo {
+        position: relative;
+        width: 402px;
+        max-width: 100vw;
+        height: 874px;
+        max-height: 100vh;
+        overflow: hidden;
+        background: #fff;
+      }
+
+      .screen {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(18px);
+        transition: opacity 220ms ease, transform 220ms ease;
+      }
+
+      .screen.is-active {
+        z-index: 2;
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(0);
+      }
+
+      .screen.is-back {
+        transform: translateX(-18px);
+      }
+
+      .screen-image {
+        display: block;
+        width: 100%;
+        height: auto;
+        user-select: none;
+        -webkit-user-drag: none;
+      }
+
+      .state-image {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        display: none;
+        width: 100%;
+        height: auto;
+        user-select: none;
+        -webkit-user-drag: none;
+        pointer-events: none;
+      }
+
+      .hotspot {
+        position: absolute;
+        display: block;
+        z-index: 10;
+        border: 0;
+        padding: 0;
+        background: transparent;
+        cursor: pointer;
+        appearance: none;
+        touch-action: manipulation;
+      }
+
+      .hotspot:focus-visible {
+        outline: 2px solid rgba(255, 98, 46, 0.9);
+        outline-offset: 2px;
+      }
+
+      .home-checkin {
+        left: 123px;
+        top: 772px;
+        width: 132px;
+        height: 86px;
+      }
+
+      .home-checkin-card {
+        left: 146px;
+        top: 709px;
+        width: 210px;
+        height: 76px;
+      }
+
+      .reward-close {
+        right: 18px;
+        top: 54px;
+        width: 48px;
+        height: 48px;
+      }
+
+      .reward-detail {
+        left: 48px;
+        top: 256px;
+        width: 176px;
+        height: 64px;
+      }
+
+      .reward-more {
+        left: 218px;
+        top: 256px;
+        width: 158px;
+        height: 64px;
+      }
+
+      .reward-finish {
+        left: 78px;
+        top: 584px;
+        width: 246px;
+        height: 62px;
+      }
+
+      .reward-history {
+        left: 120px;
+        top: 638px;
+        width: 164px;
+        height: 48px;
+      }
+
+      .page-back,
+      .my-back {
+        left: 0;
+        top: 38px;
+        width: 78px;
+        height: 72px;
+      }
+
+      .my-challenge-banner {
+        left: 34px;
+        top: 516px;
+        width: 334px;
+        height: 116px;
+      }
+
+      .my-bubble {
+        left: 48px;
+        top: 586px;
+        width: 190px;
+        height: 46px;
+        z-index: 13;
+      }
+
+      .remind-toggle {
+        position: absolute;
+        left: 330px;
+        top: 524px;
+        z-index: 14;
+        width: 44px;
+        height: 28px;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        cursor: pointer;
+        appearance: none;
+      }
+
+      .screen.is-remind-on .state-remind-on {
+        display: block;
+      }
+
+      .screen.is-bubble-hidden .state-bubble-hidden {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="iphone-demo" aria-label="iPhone 17 Pro 打卡链路 demo">
+      <section class="screen is-active" data-screen="home" aria-label="首页">
+        <img class="screen-image" src="./assets/home.svg" alt="大众点评首页" />
+        <button class="hotspot home-checkin-card" type="button" data-goto="reward" aria-label="点击打卡气泡"></button>
+        <button class="hotspot home-checkin" type="button" data-goto="reward" aria-label="点击底部打卡"></button>
+      </section>
+
+      <section class="screen" data-screen="reward" aria-label="打卡惊喜">
+        <img class="screen-image" src="./assets/reward.svg" alt="打卡惊喜页" />
+        <button class="hotspot reward-close" type="button" data-back="true" aria-label="关闭打卡惊喜"></button>
+        <button class="hotspot reward-detail" type="button" data-goto="wallet" aria-label="查看奖励详情"></button>
+        <button class="hotspot reward-more" type="button" data-goto="activity" aria-label="赢更多惊喜"></button>
+        <button class="hotspot reward-finish" type="button" data-goto="home" aria-label="完成"></button>
+        <button class="hotspot reward-history" type="button" data-goto="my" aria-label="查看历史打卡"></button>
+      </section>
+
+      <section class="screen" data-screen="wallet" aria-label="奖励详情">
+        <img class="screen-image" src="./assets/wallet.jpg" alt="钱包奖励详情页" />
+        <button class="hotspot page-back" type="button" data-back="true" aria-label="返回打卡惊喜"></button>
+      </section>
+
+      <section class="screen" data-screen="activity" aria-label="活动页">
+        <img class="screen-image" src="./assets/activity.png" alt="夏日放风计划活动页" />
+        <button class="hotspot page-back" type="button" data-back="true" aria-label="返回打卡惊喜"></button>
+      </section>
+
+      <section class="screen" data-screen="my" aria-label="我的打卡">
+        <img class="screen-image" src="./assets/my-checkins.svg" alt="我的打卡页" />
+        <img class="state-image state-remind-on" src="./assets/my-remind-on.png" alt="" aria-hidden="true" />
+        <img class="state-image state-bubble-hidden" src="./assets/my-bubble-hidden.png" alt="" aria-hidden="true" />
+        <button class="hotspot my-challenge-banner" type="button" data-goto="activity" aria-label="进入本月打卡挑战活动页"></button>
+        <button class="remind-toggle" type="button" aria-label="提醒我打卡" aria-pressed="false"></button>
+        <button class="hotspot my-bubble" type="button" data-hide-bubble="true" aria-label="关闭小熊猫气泡"></button>
+        <button class="hotspot my-back" type="button" data-back="true" aria-label="返回"></button>
+      </section>
+    </main>
+
+    <script>
+      const screens = [...document.querySelectorAll(".screen")];
+      const calendarScreen = document.querySelector('[data-screen="my"]');
+      const remindToggle = document.querySelector(".remind-toggle");
+      let currentScreen = "home";
+      let internalDepth = 0;
+
+      function notifyParent(story) {
+        window.parent?.postMessage({ type: "demo-screen", screen: story || currentScreen }, "*");
+      }
+
+      function showScreen(name, options = {}) {
+        const { push = true, direction = "forward", story = name } = options;
+        if (!screens.some((screen) => screen.dataset.screen === name)) return;
+        screens.forEach((screen) => {
+          screen.classList.toggle("is-back", direction === "back" && screen.dataset.screen === currentScreen);
+          screen.classList.toggle("is-active", screen.dataset.screen === name);
+        });
+        currentScreen = name;
+        if (push && location.hash.slice(1) !== name) {
+          internalDepth += 1;
+          history.pushState({ screen: name, depth: internalDepth }, "", `#${name}`);
+        }
+        notifyParent(story);
+      }
+
+      document.addEventListener("click", (event) => {
+        const target = event.target.closest(".hotspot");
+        if (!target) return;
+        if (target.dataset.hideBubble) {
+          calendarScreen.classList.remove("is-remind-on");
+          calendarScreen.classList.add("is-bubble-hidden");
+          remindToggle.setAttribute("aria-pressed", "false");
+          notifyParent("bubble");
+          return;
+        }
+        if (target.dataset.back) {
+          if (internalDepth > 0) {
+            history.back();
+          } else {
+            showScreen("home", { push: false, direction: "back" });
+          }
+          return;
+        }
+        if (target.dataset.goto) {
+          showScreen(target.dataset.goto, { push: true, direction: "forward" });
+        }
+      });
+
+      remindToggle.addEventListener("click", () => {
+        calendarScreen.classList.remove("is-bubble-hidden");
+        const isOn = calendarScreen.classList.toggle("is-remind-on");
+        remindToggle.setAttribute("aria-pressed", String(isOn));
+        notifyParent(isOn ? "remind" : "my");
+      });
+
+      window.addEventListener("message", (event) => {
+        const data = event.data || {};
+        if (data.type !== "show-demo-screen") return;
+        if (data.screen === "remind") {
+          showScreen("my", { push: false, direction: "forward", story: "remind" });
+          calendarScreen.classList.remove("is-bubble-hidden");
+          calendarScreen.classList.add("is-remind-on");
+          remindToggle.setAttribute("aria-pressed", "true");
+          notifyParent("remind");
+          return;
+        }
+        if (data.screen === "bubble") {
+          showScreen("my", { push: false, direction: "forward", story: "bubble" });
+          calendarScreen.classList.remove("is-remind-on");
+          calendarScreen.classList.add("is-bubble-hidden");
+          remindToggle.setAttribute("aria-pressed", "false");
+          notifyParent("bubble");
+          return;
+        }
+        calendarScreen.classList.remove("is-remind-on", "is-bubble-hidden");
+        remindToggle.setAttribute("aria-pressed", "false");
+        showScreen(data.screen || "home", { push: false, direction: "forward" });
+      });
+
+      const initialScreen = location.hash.slice(1);
+      if (initialScreen && screens.some((screen) => screen.dataset.screen === initialScreen)) {
+        currentScreen = initialScreen;
+        history.replaceState({ screen: initialScreen, depth: 0 }, "", `#${initialScreen}`);
+        showScreen(initialScreen, { push: false, direction: "forward" });
+      } else {
+        history.replaceState({ screen: "home", depth: 0 }, "", "#home");
+        notifyParent("home");
+      }
+
+      window.addEventListener("popstate", () => {
+        const screenFromHash = location.hash.slice(1) || "home";
+        if (!screens.some((screen) => screen.dataset.screen === screenFromHash)) {
+          showScreen("home", { push: false, direction: "back" });
+          return;
+        }
+        internalDepth = Math.max(0, internalDepth - 1);
+        showScreen(screenFromHash, { push: false, direction: "back" });
+      });
+    </script>
+  </body>
+</html>
