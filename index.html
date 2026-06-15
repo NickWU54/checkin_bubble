@@ -279,14 +279,14 @@
 
       .demo-layout {
         display: grid;
-        grid-template-columns: 460px 1fr;
+        grid-template-columns: minmax(300px, 430px) 1fr;
         gap: 5vw;
         height: calc(100vh - 16vh);
         align-items: center;
       }
 
       .phone-shell {
-        width: 430px;
+        width: min(430px, calc((100vh - 150px) * 430 / 930));
         border-radius: 12px;
         padding: 14px;
         background: #0f1219;
@@ -306,9 +306,9 @@
 
       iframe {
         display: block;
-        width: 402px;
-        height: 874px;
-        max-height: calc(100vh - 150px);
+        width: 100%;
+        height: auto;
+        aspect-ratio: 402 / 874;
         border: 0;
         border-radius: 8px;
         background: #fff;
